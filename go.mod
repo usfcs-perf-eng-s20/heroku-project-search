@@ -1,4 +1,4 @@
-module github.com/usfcs-perf-eng-s20/project-go-search
+module git.heroku.com/project-go-search
 
 go 1.12
 
