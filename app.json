@@ -1,0 +1,10 @@
+{
+  "name": "Project Go Search",
+  "description": "Search microservice for CS486/686",
+  "keywords": [
+    "search",
+    "go"
+  ],
+  "website": "https://github.com/usfcs-perf-eng-s20/project-go-search",
+  "repository": "https://git.heroku.com/project-go-search.git"
+}
