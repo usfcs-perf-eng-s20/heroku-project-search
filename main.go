@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -69,6 +70,8 @@ func main() {
 }
 
 func foo(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=%s",
 		host, port, user, password, dbname, sslmode)
@@ -79,7 +82,7 @@ func foo(c *gin.Context) {
 
 	sqlStatement := `SELECT * FROM dvds WHERE id=$1;`
 	var dvd Detail
-	row := db.QueryRow(sqlStatement, 65607)
+	row := db.QueryRow(sqlStatement, id)
 
 	queryErr := row.Scan(&dvd.Title, &dvd.Studio, &dvd.price, &dvd.rating, &dvd.year,
 		&dvd.genre, &dvd.upc, &dvd.id)
