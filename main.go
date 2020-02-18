@@ -73,7 +73,49 @@ func main() {
 }
 
 func search(c *gin.Context) {
-	c.String(200, "Search endpoint")
+	// get search keywords
+	keyword := c.Query("keyword")
+	fmt.Printf("keyword is: %s\n", keyword)
+
+	dvds := []Detail{}
+
+	// connect to database
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+		"password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Successfully connected to DB")
+
+	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE '%' || $1 || '%' ;`
+	fmt.Println("'%" + keyword + "%'")
+	rows, err := db.Query(sqlStatement, keyword)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		var dvd Detail
+		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
+			&dvd.Genre, &dvd.Upc, &dvd.ID)
+		switch queryErr {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned!")
+			return
+		case nil:
+			dvds = append(dvds, dvd)
+			fmt.Println(dvd)
+		default:
+			panic(queryErr)
+		}
+	}
+
+	defer db.Close()
+	fmt.Println(dvds)
+	c.JSON(200, dvds)
 }
 
 func getMoviesByIDs(c *gin.Context) {
