@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/lib/pq"
 	"log"
@@ -37,16 +36,13 @@ func search(c *gin.Context) {
 
 	var dvds []Detail
 
-	// connect to database
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslmode)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := getDbConn()
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
 		return
 	}
+	defer db.Close()
 
 	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE '%' || $1 || '%' ;`
 	rows, err := db.Query(sqlStatement, keyword)
@@ -57,16 +53,21 @@ func search(c *gin.Context) {
 		return
 	}
 
+	if !rows.Next() {
+		c.JSON(200, "[]")
+		return
+	}
+
 	for rows.Next() {
 		var dvd Detail
 		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
 			&dvd.Genre, &dvd.Upc, &dvd.ID)
 		switch queryErr {
 		case sql.ErrNoRows:
+			c.JSON(200, "[]")
 			return
 		case nil:
 			dvds = append(dvds, dvd)
-			log.Println(dvd)
 		default:
 			log.Println(queryErr)
 			c.JSON(500, "internal server error")
@@ -74,8 +75,6 @@ func search(c *gin.Context) {
 		}
 	}
 
-	defer db.Close()
-	log.Println(dvds)
 	c.JSON(200, dvds)
 }
 
@@ -91,16 +90,13 @@ func getMoviesByIDs(c *gin.Context) {
 		log.Println(idList)
 	}
 
-	// connect to database
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslmode)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := getDbConn()
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
 		return
 	}
+	defer db.Close()
 
 	sqlStatement := `SELECT * FROM dvds WHERE id = any($1);`
 	rows, err := db.Query(sqlStatement, pq.Array(idList))
@@ -111,13 +107,18 @@ func getMoviesByIDs(c *gin.Context) {
 		return
 	}
 
+	if !rows.Next() {
+		c.JSON(200, "[]")
+		return
+	}
+
 	for rows.Next() {
 		var dvd Detail
 		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
 			&dvd.Genre, &dvd.Upc, &dvd.ID)
 		switch queryErr {
 		case sql.ErrNoRows:
-			log.Println("No rows were returned!")
+			c.JSON(200, "{}")
 			return
 		case nil:
 			dvds = append(dvds, dvd)
@@ -128,23 +129,19 @@ func getMoviesByIDs(c *gin.Context) {
 		}
 	}
 
-	defer db.Close()
-	log.Println(dvds)
 	c.JSON(200, dvds)
 }
 
 func getMovieByID(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=%s",
-		host, port, user, password, dbname, sslmode)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := getDbConn()
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
 		return
 	}
+	defer db.Close()
 
 	sqlStatement := `SELECT * FROM dvds WHERE id=$1;`
 	var dvd Detail
@@ -153,21 +150,17 @@ func getMovieByID(c *gin.Context) {
 	queryErr := row.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
 		&dvd.Genre, &dvd.Upc, &dvd.ID)
 
-	log.Println(dvd)
-
 	switch queryErr {
 	case sql.ErrNoRows:
-		log.Println("No rows were returned!")
+		c.JSON(200, "{}")
 		return
 	case nil:
-		log.Println("success")
 	default:
 		log.Println(queryErr)
 		c.JSON(500, "internal server error")
 		return
 	}
 
-	defer db.Close()
 	c.JSON(200, dvd)
 }
 
