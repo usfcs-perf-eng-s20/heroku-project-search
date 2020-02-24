@@ -21,6 +21,3 @@ vendor/
 .env
 .docker_build/
 bin/
-
-# DB login credentials
-db.go
