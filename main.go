@@ -15,6 +15,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type Detail struct {
+	Title  string
+	Studio string
+	Price  string
+	Rating string
+	Year   string
+	Genre  string
+	Upc    string
+	ID     int64
+}
+
 type idList struct {
 	IdList []int64 `json:"ids" binding:"required"`
 }
