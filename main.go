@@ -44,7 +44,7 @@ func search(c *gin.Context) {
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
@@ -53,7 +53,7 @@ func search(c *gin.Context) {
 
 	if err != nil {
 		log.Println(err)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
@@ -69,7 +69,7 @@ func search(c *gin.Context) {
 			log.Println(dvd)
 		default:
 			log.Println(queryErr)
-			c.JSON(500, "")
+			c.JSON(500, "internal server error")
 			return
 		}
 	}
@@ -98,7 +98,7 @@ func getMoviesByIDs(c *gin.Context) {
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
@@ -107,7 +107,7 @@ func getMoviesByIDs(c *gin.Context) {
 
 	if err != nil {
 		log.Println(err)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
@@ -123,7 +123,7 @@ func getMoviesByIDs(c *gin.Context) {
 			dvds = append(dvds, dvd)
 		default:
 			log.Println(queryErr)
-			c.JSON(500, "")
+			c.JSON(500, "internal server error")
 			return
 		}
 	}
@@ -142,7 +142,7 @@ func getMovieByID(c *gin.Context) {
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Println(err)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
@@ -163,7 +163,7 @@ func getMovieByID(c *gin.Context) {
 		log.Println("success")
 	default:
 		log.Println(queryErr)
-		c.JSON(500, "")
+		c.JSON(500, "internal server error")
 		return
 	}
 
