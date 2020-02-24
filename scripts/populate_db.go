@@ -13,6 +13,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const MaxDbSize = 9999
+
 func getDbConn() (db *sql.DB, err error) {
 	// connect to database
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -60,7 +62,7 @@ func main() {
 
 	fmt.Println(ids)
 	i := 0
-	for i < 9500 {
+	for i < MaxDbSize- len(ids) {
 		line, err := reader.Read()
 		if err == io.EOF {
 			break
