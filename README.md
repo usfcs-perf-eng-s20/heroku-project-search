@@ -11,6 +11,9 @@ $ git clone git@github.com:usfcs-perf-eng-s20/heroku-project-search.git $PROJECT
 $ cd $PROJECT_PATH
 ```
 
+## Obtain DB credentials
+Ask Daniel, Zini or Olivia on Slack for database credentials.
+
 ## Running Locally
 
 ```shell script
