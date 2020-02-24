@@ -36,10 +36,8 @@ func search(c *gin.Context) {
 		c.JSON(500, "")
 		return
 	}
-	log.Println("Successfully connected to DB")
 
 	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE '%' || $1 || '%' ;`
-	log.Println("'%" + keyword + "%'")
 	rows, err := db.Query(sqlStatement, keyword)
 
 	if err != nil {
@@ -54,13 +52,14 @@ func search(c *gin.Context) {
 			&dvd.Genre, &dvd.Upc, &dvd.ID)
 		switch queryErr {
 		case sql.ErrNoRows:
-			log.Println("No rows were returned!")
 			return
 		case nil:
 			dvds = append(dvds, dvd)
 			log.Println(dvd)
 		default:
-			panic(queryErr)
+			log.Println(queryErr)
+			c.JSON(500, "")
+			return
 		}
 	}
 
@@ -74,7 +73,7 @@ func getMoviesByIDs(c *gin.Context) {
 	ids := idList{}
 	var idList []int64
 	var dvds []Detail
-	
+
 	// This reads c.Request.Body and stores the result into the context.
 	if err := c.ShouldBindBodyWith(&ids, binding.JSON); err == nil {
 		idList = ids.IdList
@@ -91,7 +90,6 @@ func getMoviesByIDs(c *gin.Context) {
 		c.JSON(500, "")
 		return
 	}
-	log.Println("Successfully connected to DB")
 
 	sqlStatement := `SELECT * FROM dvds WHERE id = any($1);`
 	rows, err := db.Query(sqlStatement, pq.Array(idList))
@@ -112,9 +110,10 @@ func getMoviesByIDs(c *gin.Context) {
 			return
 		case nil:
 			dvds = append(dvds, dvd)
-			log.Println(dvd)
 		default:
-			panic(queryErr)
+			log.Println(queryErr)
+			c.JSON(500, "")
+			return
 		}
 	}
 
@@ -135,7 +134,6 @@ func getMovieByID(c *gin.Context) {
 		c.JSON(500, "")
 		return
 	}
-	log.Println("Successfully connected to DB")
 
 	sqlStatement := `SELECT * FROM dvds WHERE id=$1;`
 	var dvd Detail
@@ -151,9 +149,11 @@ func getMovieByID(c *gin.Context) {
 		log.Println("No rows were returned!")
 		return
 	case nil:
-		log.Println(dvd)
+		log.Println("success")
 	default:
-		panic(queryErr)
+		log.Println(queryErr)
+		c.JSON(500, "")
+		return
 	}
 
 	defer db.Close()
