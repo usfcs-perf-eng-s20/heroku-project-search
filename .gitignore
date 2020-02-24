@@ -21,3 +21,6 @@ vendor/
 .env
 .docker_build/
 bin/
+
+# Scripts
+scripts/db.go
