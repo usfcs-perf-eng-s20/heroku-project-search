@@ -12,7 +12,11 @@ $ cd $PROJECT_PATH
 ```
 
 ## Obtain DB credentials
-Ask Daniel, Zini or Olivia on Slack for database credentials.
+```shell script
+$ heroku config -a perfeng-go-search -s >> .env
+```
+
+Ask Daniel, Zini or Olivia on Slack for Heroku app access.
 
 ## Running Locally
 
