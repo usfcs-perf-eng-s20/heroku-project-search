@@ -6,9 +6,13 @@ Make sure you have [Go](http://golang.org/doc/install) version 1.12 or newer and
 
 ```shell script
 $ export PROJECT_PATH="$(go env GOROOT)/src/github.com/usfcs-perf-eng-s20/"
-$ git clone git@github.com:usfcs-perf-eng-s20/project-go-search.git $PROJECT_PATH
+$ mkdir -p "$PROJECT_PATH"
+$ git clone git@github.com:usfcs-perf-eng-s20/heroku-project-search.git $PROJECT_PATH
 $ cd $PROJECT_PATH
 ```
+
+## Obtain DB credentials
+Ask Daniel, Zini or Olivia on Slack for database credentials.
 
 ## Running Locally
 
@@ -19,17 +23,7 @@ $ make local
 or alternatively:
 
 ```shell script
-$ go build -o bin/go-search -v .
-github.com/mattn/go-colorable
-gopkg.in/bluesuncorp/validator.v5
-golang.org/x/net/context
-github.com/heroku/x/hmetrics
-github.com/gin-gonic/gin/render
-github.com/manucorporat/sse
-github.com/heroku/x/hmetrics/onload
-github.com/gin-gonic/gin/binding
-github.com/gin-gonic/gin
-github.com/heroku/project-go-search
+$ go build -o bin/project-go-search -v .
 $ heroku local
 ```
 
