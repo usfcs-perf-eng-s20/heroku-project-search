@@ -2,12 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -101,14 +101,24 @@ func search(c *gin.Context) {
 func getMoviesByIDs(c *gin.Context) {
 	start := time.Now()
 	// get query ids
-	ids := idList{}
-	var idList []int64
+	//ids := idList{}
+	var idList []int
 	var dvds []Detail
 	var event *analyticsEvent
 
-	// This reads c.Request.Body and stores the result into the context.
-	if err := c.ShouldBindBodyWith(&ids, binding.JSON); err == nil {
-		idList = ids.IdList
+	idsString := strings.Split(c.Query("ids"), ",")
+
+	for i := 0; i < len(idsString) ;i++  {
+		id, err := strconv.Atoi(strings.TrimSpace(idsString[i]))
+		if err != nil {
+			log.Println(err)
+			c.JSON(400, "bad request")
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "400", false,
+				start.UTC().Format(time.RFC3339))
+			go postEvent(event)
+			return
+		}
+		idList = append(idList, id)
 	}
 
 	db, err := getDbConn()
@@ -234,7 +244,7 @@ func main() {
 
 	router.GET("/getMovieById", getMovieByID)
 	router.GET("/search", search)
-	router.POST("/getMoviesByIds", getMoviesByIDs)
+	router.GET("/getMoviesByIds", getMoviesByIDs)
 
 	router.Run(":" + port)
 }
