@@ -100,8 +100,6 @@ func search(c *gin.Context) {
 
 func getMoviesByIDs(c *gin.Context) {
 	start := time.Now()
-	// get query ids
-	//ids := idList{}
 	var idList []int
 	var dvds []Detail
 	var event *analyticsEvent
@@ -139,14 +137,6 @@ func getMoviesByIDs(c *gin.Context) {
 		log.Println(err)
 		c.JSON(500, "internal server error")
 		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "500", false,
-			start.UTC().Format(time.RFC3339))
-		go postEvent(event)
-		return
-	}
-
-	if !rows.Next() {
-		c.JSON(200, "[]")
-		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "200", true,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
