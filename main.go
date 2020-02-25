@@ -234,7 +234,7 @@ func main() {
 
 	router.GET("/getMovieById", getMovieByID)
 	router.GET("/search", search)
-	router.POST("/getMoviesByIds", getMoviesByIDs)
+	router.GET("/getMoviesByIds", getMoviesByIDs)
 
 	router.Run(":" + port)
 }
