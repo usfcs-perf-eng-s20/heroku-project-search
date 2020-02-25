@@ -2,7 +2,7 @@
 
 ## Setup
 
-Make sure you have [Go](http://golang.org/doc/install) version 1.12 or newer and the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed.
+Make sure you have [Go](http://golang.org/doc/install) version 1.13 or newer and the [Heroku Toolbelt](https://toolbelt.heroku.com/) installed.
 
 ```shell script
 $ export PROJECT_PATH="$(go env GOROOT)/src/github.com/usfcs-perf-eng-s20/"
