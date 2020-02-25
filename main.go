@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -30,9 +31,10 @@ type idList struct {
 }
 
 func search(c *gin.Context) {
+	start := time.Now()
 	// get search keywords
 	keyword := c.Query("keyword")
-	log.Printf("keyword is: %s\n", keyword)
+	var event *analyticsEvent
 
 	var dvds []Detail
 
@@ -40,6 +42,9 @@ func search(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
+		event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 	defer db.Close()
@@ -50,11 +55,17 @@ func search(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
+		event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 
 	if !rows.Next() {
 		c.JSON(200, "[]")
+		event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 
@@ -65,35 +76,48 @@ func search(c *gin.Context) {
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, "[]")
+			event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+				start.UTC().Format(time.RFC3339))
+			go postEvent(event)
 			return
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
 			log.Println(queryErr)
 			c.JSON(500, "internal server error")
+			event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+				start.UTC().Format(time.RFC3339))
+			go postEvent(event)
 			return
 		}
 	}
 
 	c.JSON(200, dvds)
+	event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+		start.UTC().Format(time.RFC3339))
+	go postEvent(event)
 }
 
 func getMoviesByIDs(c *gin.Context) {
+	start := time.Now()
 	// get query ids
 	ids := idList{}
 	var idList []int64
 	var dvds []Detail
+	var event *analyticsEvent
 
 	// This reads c.Request.Body and stores the result into the context.
 	if err := c.ShouldBindBodyWith(&ids, binding.JSON); err == nil {
 		idList = ids.IdList
-		log.Println(idList)
 	}
 
 	db, err := getDbConn()
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
+		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 	defer db.Close()
@@ -104,11 +128,17 @@ func getMoviesByIDs(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
+		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 
 	if !rows.Next() {
 		c.JSON(200, "[]")
+		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 
@@ -119,26 +149,40 @@ func getMoviesByIDs(c *gin.Context) {
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, "{}")
+			event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+				start.UTC().Format(time.RFC3339))
+			go postEvent(event)
 			return
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
 			log.Println(queryErr)
 			c.JSON(500, "internal server error")
+			event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+				start.UTC().Format(time.RFC3339))
+			go postEvent(event)
 			return
 		}
 	}
 
 	c.JSON(200, dvds)
+	event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+		start.UTC().Format(time.RFC3339))
+	go postEvent(event)
 }
 
 func getMovieByID(c *gin.Context) {
+	start := time.Now()
 	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	var event *analyticsEvent
 
 	db, err := getDbConn()
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
+		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 	defer db.Close()
@@ -153,15 +197,24 @@ func getMovieByID(c *gin.Context) {
 	switch queryErr {
 	case sql.ErrNoRows:
 		c.JSON(200, "{}")
+		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "200", true,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	case nil:
 	default:
 		log.Println(queryErr)
 		c.JSON(500, "internal server error")
+		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "500", false,
+			start.UTC().Format(time.RFC3339))
+		go postEvent(event)
 		return
 	}
 
 	c.JSON(200, dvd)
+	event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "200", true,
+		start.UTC().Format(time.RFC3339))
+	go postEvent(event)
 }
 
 func main() {
