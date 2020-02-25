@@ -42,7 +42,7 @@ func search(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
-		event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -55,7 +55,7 @@ func search(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
-		event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -63,7 +63,7 @@ func search(c *gin.Context) {
 
 	if !rows.Next() {
 		c.JSON(200, "[]")
-		event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+		event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "200", true,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -76,7 +76,7 @@ func search(c *gin.Context) {
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, "[]")
-			event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+			event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "200", true,
 				start.UTC().Format(time.RFC3339))
 			go postEvent(event)
 			return
@@ -85,7 +85,7 @@ func search(c *gin.Context) {
 		default:
 			log.Println(queryErr)
 			c.JSON(500, "internal server error")
-			event = getEvent("/search", time.Since(start).Milliseconds(), "500", false,
+			event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "500", false,
 				start.UTC().Format(time.RFC3339))
 			go postEvent(event)
 			return
@@ -93,7 +93,7 @@ func search(c *gin.Context) {
 	}
 
 	c.JSON(200, dvds)
-	event = getEvent("/search", time.Since(start).Milliseconds(), "200", true,
+	event = getEvent("/search", time.Since(start).Nanoseconds() / 1000, "200", true,
 		start.UTC().Format(time.RFC3339))
 	go postEvent(event)
 }
@@ -115,7 +115,7 @@ func getMoviesByIDs(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
-		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -128,7 +128,7 @@ func getMoviesByIDs(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
-		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -136,7 +136,7 @@ func getMoviesByIDs(c *gin.Context) {
 
 	if !rows.Next() {
 		c.JSON(200, "[]")
-		event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "200", true,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -149,7 +149,7 @@ func getMoviesByIDs(c *gin.Context) {
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, "{}")
-			event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "200", true,
 				start.UTC().Format(time.RFC3339))
 			go postEvent(event)
 			return
@@ -158,7 +158,7 @@ func getMoviesByIDs(c *gin.Context) {
 		default:
 			log.Println(queryErr)
 			c.JSON(500, "internal server error")
-			event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "500", false,
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "500", false,
 				start.UTC().Format(time.RFC3339))
 			go postEvent(event)
 			return
@@ -166,7 +166,7 @@ func getMoviesByIDs(c *gin.Context) {
 	}
 
 	c.JSON(200, dvds)
-	event = getEvent("/getMoviesByIds", time.Since(start).Milliseconds(), "200", true,
+	event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds() / 1000, "200", true,
 		start.UTC().Format(time.RFC3339))
 	go postEvent(event)
 }
@@ -180,7 +180,7 @@ func getMovieByID(c *gin.Context) {
 	if err != nil {
 		log.Println(err)
 		c.JSON(500, "internal server error")
-		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -197,7 +197,7 @@ func getMovieByID(c *gin.Context) {
 	switch queryErr {
 	case sql.ErrNoRows:
 		c.JSON(200, "{}")
-		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "200", true,
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds() / 1000, "200", true,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
@@ -205,14 +205,14 @@ func getMovieByID(c *gin.Context) {
 	default:
 		log.Println(queryErr)
 		c.JSON(500, "internal server error")
-		event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "500", false,
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds() / 1000, "500", false,
 			start.UTC().Format(time.RFC3339))
 		go postEvent(event)
 		return
 	}
 
 	c.JSON(200, dvd)
-	event = getEvent("/getMovieById", time.Since(start).Milliseconds(), "200", true,
+	event = getEvent("/getMovieById", time.Since(start).Nanoseconds() / 1000, "200", true,
 		start.UTC().Format(time.RFC3339))
 	go postEvent(event)
 }
