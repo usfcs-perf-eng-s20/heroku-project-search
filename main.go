@@ -69,17 +69,6 @@ func search(c *gin.Context) {
 		return
 	}
 
-	if !rows.Next() {
-		c.JSON(200, gin.H{
-			"success": "true",
-			"results": "[]",
-		})
-		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true,
-			start.UTC().Format(time.RFC3339))
-		go postEvent(event)
-		return
-	}
-
 	for rows.Next() {
 		var dvd Detail
 		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
