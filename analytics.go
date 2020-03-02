@@ -23,6 +23,7 @@ type analyticsEvent struct {
 }
 
 var analyticsHost = fmt.Sprint(os.Getenv("ANALYTICS_URL"), "/saveEdr")
+var storeAnalytics = os.Getenv("STORE_ANALYTICS") == "1"
 
 func getEvent(path string, timeMillis int64, response string, success bool, timestamp time.Time) *analyticsEvent {
 	e := analyticsEvent{
@@ -39,6 +40,9 @@ func getEvent(path string, timeMillis int64, response string, success bool, time
 }
 
 func postEvent(e *analyticsEvent) {
+	if !storeAnalytics {
+		return
+	}
 	jsonEvent, err := json.Marshal(e)
 	if err != nil {
 		log.Println("internal error:", err)
