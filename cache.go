@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/golang/groupcache/lru"
+	"log"
 	"os"
 	"strconv"
 )
@@ -22,6 +23,7 @@ func getCacheKey(path string, argument string) cacheKey {
 }
 
 func createCache() *lru.Cache {
-	MaxEntries, _ := strconv.Atoi(os.Getenv("ANALYTICS_URL"))
+	MaxEntries, _ := strconv.Atoi(os.Getenv("CACHE_MAX_ENTRIES"))
+	log.Println("Using a cache with ", MaxEntries, " entries")
 	return lru.New(MaxEntries)
 }
