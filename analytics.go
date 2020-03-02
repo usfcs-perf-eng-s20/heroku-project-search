@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
+	"strconv"
 )
 
 type analyticsEvent struct {
@@ -22,7 +24,7 @@ type analyticsEvent struct {
 
 var analyticsHost = fmt.Sprint(os.Getenv("ANALYTICS_URL"), "/saveEdr")
 
-func getEvent(path string, timeMillis int64, response string, success bool, timestamp string) *analyticsEvent {
+func getEvent(path string, timeMillis int64, response string, success bool, timestamp time.Time) *analyticsEvent {
 	e := analyticsEvent{
 		Method:    "GET",
 		Path:      path,
@@ -30,7 +32,7 @@ func getEvent(path string, timeMillis int64, response string, success bool, time
 		Response:  response,
 		Service:   "search",
 		Success:   success,
-		Timestamp: timestamp,
+		Timestamp: strconv.Itoa(int(timestamp.UTC().Unix())),
 		Username:  "",
 	}
 	return &e

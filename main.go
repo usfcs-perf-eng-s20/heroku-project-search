@@ -46,8 +46,7 @@ func search(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
@@ -63,8 +62,7 @@ func search(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
@@ -79,8 +77,7 @@ func search(c *gin.Context) {
 				"success": "true",
 				"results": "[]",
 			})
-			event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true,
-				start.UTC().Format(time.RFC3339))
+			event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 			go postEvent(event)
 			return
 		case nil:
@@ -91,8 +88,7 @@ func search(c *gin.Context) {
 				"success": "false",
 				"message": "internal server error",
 			})
-			event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false,
-				start.UTC().Format(time.RFC3339))
+			event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "500", false, start)
 			go postEvent(event)
 			return
 		}
@@ -102,8 +98,7 @@ func search(c *gin.Context) {
 		"success": "true",
 		"results": dvds,
 	})
-	event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true,
-		start.UTC().Format(time.RFC3339))
+	event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
 }
 
@@ -123,8 +118,7 @@ func getMoviesByIDs(c *gin.Context) {
 				"success": "false",
 				"message": "bad request",
 			})
-			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "400", false,
-				start.UTC().Format(time.RFC3339))
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "400", false, start)
 			go postEvent(event)
 			return
 		}
@@ -138,8 +132,7 @@ func getMoviesByIDs(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
@@ -154,8 +147,7 @@ func getMoviesByIDs(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
@@ -170,8 +162,7 @@ func getMoviesByIDs(c *gin.Context) {
 				"success": "true",
 				"results": "[]",
 			})
-			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true,
-				start.UTC().Format(time.RFC3339))
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 			go postEvent(event)
 			return
 		case nil:
@@ -182,8 +173,7 @@ func getMoviesByIDs(c *gin.Context) {
 				"success": "false",
 				"message": "internal server error",
 			})
-			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false,
-				start.UTC().Format(time.RFC3339))
+			event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "500", false, start)
 			go postEvent(event)
 			return
 		}
@@ -193,8 +183,7 @@ func getMoviesByIDs(c *gin.Context) {
 		"success": "true",
 		"results": dvds,
 	})
-	event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true,
-		start.UTC().Format(time.RFC3339))
+	event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
 }
 
@@ -210,8 +199,7 @@ func getMovieByID(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
@@ -230,8 +218,7 @@ func getMovieByID(c *gin.Context) {
 			"success": "true",
 			"results": "[]",
 		})
-		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 		return
 	case nil:
@@ -241,15 +228,13 @@ func getMovieByID(c *gin.Context) {
 			"success": "false",
 			"message": "internal server error",
 		})
-		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "500", false,
-			start.UTC().Format(time.RFC3339))
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "500", false, start)
 		go postEvent(event)
 		return
 	}
 
 	c.JSON(200, dvd)
-	event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true,
-		start.UTC().Format(time.RFC3339))
+	event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
 }
 
