@@ -36,6 +36,17 @@ func search(c *gin.Context) {
 	// get search keywords
 	keyword := c.Query("keyword")
 	var event *analyticsEvent
+	queryKey := getCacheKey("/search", keyword)
+	resp, hit := cache.Get(queryKey)
+	if hit {
+		c.JSON(200, gin.H{
+			"success": "true",
+			"results": resp,
+		})
+		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
+		go postEvent(event)
+		return
+	}
 
 	var dvds []Detail
 
@@ -100,15 +111,28 @@ func search(c *gin.Context) {
 	})
 	event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+	cache.Add(queryKey, dvds)
 }
 
 func getMoviesByIDs(c *gin.Context) {
 	start := time.Now()
+	var event *analyticsEvent
+	ids := c.Query("ids")
+	queryKey := getCacheKey("/getMoviesByIDs", ids)
+	resp, hit := cache.Get(queryKey)
+	if hit {
+		c.JSON(200, gin.H{
+			"success": "true",
+			"results": resp,
+		})
+		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
+		go postEvent(event)
+		return
+	}
 	var idList []int
 	var dvds []Detail
-	var event *analyticsEvent
 
-	idsString := strings.Split(c.Query("ids"), ",")
+	idsString := strings.Split(ids, ",")
 
 	for i := 0; i < len(idsString); i++ {
 		id, err := strconv.Atoi(strings.TrimSpace(idsString[i]))
@@ -185,12 +209,24 @@ func getMoviesByIDs(c *gin.Context) {
 	})
 	event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+	cache.Add(queryKey, dvds)
 }
 
 func getMovieByID(c *gin.Context) {
 	start := time.Now()
 	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
 	var event *analyticsEvent
+	queryKey := getCacheKey("/getMovieByID", strconv.Itoa(int(id)))
+	resp, hit := cache.Get(queryKey)
+	if hit {
+		c.JSON(200, gin.H{
+			"success": "true",
+			"results": resp,
+		})
+		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
+		go postEvent(event)
+		return
+	}
 
 	db, err := getDbConn()
 	if err != nil {
@@ -236,6 +272,7 @@ func getMovieByID(c *gin.Context) {
 	c.JSON(200, dvd)
 	event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+	cache.Add(queryKey, dvd)
 }
 
 func main() {
