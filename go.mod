@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/heroku/x v0.0.0-20171004170240-705849e307dd
 	github.com/json-iterator/go v1.1.9 // indirect
