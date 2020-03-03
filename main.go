@@ -45,6 +45,8 @@ func search(c *gin.Context) {
 		})
 		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
+
+		log.Println("Fetching results from cache")
 		return
 	}
 
@@ -127,6 +129,8 @@ func getMoviesByIDs(c *gin.Context) {
 		})
 		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
+
+		log.Println("Fetching results from cache")
 		return
 	}
 	var idList []int
@@ -225,6 +229,8 @@ func getMovieByID(c *gin.Context) {
 		})
 		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
+
+		log.Println("Fetching results from cache")
 		return
 	}
 
