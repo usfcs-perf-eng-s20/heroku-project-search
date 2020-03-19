@@ -13,7 +13,7 @@ $ cd $PROJECT_PATH
 
 ## Obtain DB credentials
 ```shell script
-$ heroku config -a perfeng-go-search -s >> .env
+$ heroku config -a perfeng-search -s >> .env
 ```
 
 Ask Daniel, Zini or Olivia on Slack for Heroku app access.
