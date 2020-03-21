@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/lib/pq"
 	"log"
 	"net/http"
@@ -66,7 +65,6 @@ func search(c *gin.Context) {
 	defer db.Close()
 
 	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE '%' || $1 || '%' LIMIT 50;`
-	fmt.Println(strings.ToLower(keyword))
 	rows, err := db.Query(sqlStatement, strings.ToLower(keyword))
 
 	if err != nil {

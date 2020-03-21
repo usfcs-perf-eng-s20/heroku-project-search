@@ -46,3 +46,36 @@ $ heroku open -a perfeng-go-search
 For more information about using Go on Heroku, see these Dev Center articles:
 
 - [Go on Heroku](https://devcenter.heroku.com/categories/go)
+
+
+## Database
+Login to remote Postgres instance
+```shell script
+psql -h <host> -p <port> -W -U <user> -d <db name>
+```
+
+Create schema:
+```sql
+CREATE TABLE dvds (
+id bigint PRIMARY KEY,
+title VARCHAR (300) NOT NULL,
+studio VARCHAR(50) NOT NULL,
+price VARCHAR(10) NOT NULL,
+rating VARCHAR(30) NOT NULL,
+year VARCHAR(10) NOT NULL,
+genre VARCHAR(30) NOT NULL,
+upc VARCHAR(30) NOT NULL);
+```
+
+Create a CSV with the identical schema
+```text
+id,title,studio,price,rating,year,genre,upc
+316270,Innocent Man (1989/ Kino Lorber Studio Classics/ Special Edition),Kino Lorber Studio Classics,$14.95,R,1989,Drama,738329235635
+316271,Innocent Man (1989/ Kino Lorber Studio Classics/ Special Edition/ Blu-ray),Kino Lorber Studio Classics,$19.95,R,1989,Drama,738329235642
+...
+```
+
+Populate table from a csv file
+```sql
+\copy dvds FROM <path to file> with (format csv,header true, delimiter ',');
+```
