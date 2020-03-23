@@ -7,23 +7,23 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 	"strconv"
+	"time"
 )
 
 type analyticsEvent struct {
-	Method string `json:"method"`
-	Path string `json:"path"`
-	TimeMilis int64 `json:"processingTimeInMiliseconds"`
-	Response string `json:"responseCode"`
-	Service string `json:"serviceName"`
-	Success bool `json:"success"`
+	Method    string `json:"method"`
+	Path      string `json:"path"`
+	TimeMilis int64  `json:"processingTimeInMiliseconds"`
+	Response  string `json:"responseCode"`
+	Service   string `json:"serviceName"`
+	Success   bool   `json:"success"`
 	Timestamp string `json:"timestamp"`
-	Username string `json:"username"`
+	Username  string `json:"username"`
 }
 
 var analyticsHost = fmt.Sprint(os.Getenv("ANALYTICS_URL"), "/saveEdr")
-var storeAnalytics = os.Getenv("STORE_ANALYTICS") == "1"
+var storeAnalytics = os.Getenv("STORE_ANALYTICS") == "true"
 
 func getEvent(path string, timeMillis int64, response string, success bool, timestamp time.Time) *analyticsEvent {
 	e := analyticsEvent{
