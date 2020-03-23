@@ -50,7 +50,7 @@ func config(c *gin.Context) {
 	updateFlag(faves, favesOk, "CALL_FAVES")
 	updateFlag(login, loginOk, "CALL_LOGIN")
 
-	c.HTML(http.StatusOK, "index.tmpl.html", gin.H{
+	c.HTML(http.StatusOK, "config.tmpl.html", gin.H{
 		"analytics_status": os.Getenv("STORE_ANALYTICS"),
 		"faves_status":     os.Getenv("CALL_FAVES"),
 		"login_status":     os.Getenv("CALL_LOGIN"),
