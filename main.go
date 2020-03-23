@@ -30,6 +30,33 @@ type idList struct {
 	IdList []int64 `json:"ids" binding:"required"`
 }
 
+func updateFlag(value string, statusOk bool, varName string) {
+	if statusOk {
+		_, err := strconv.ParseBool(value)
+		if err == nil {
+			os.Setenv(varName, value)
+		} else {
+			log.Println("Invalid config value for ", varName)
+		}
+	}
+}
+
+func config(c *gin.Context) {
+	analytics, analyticsOk := c.GetQuery("analytics")
+	faves, favesOk := c.GetQuery("faves")
+	login, loginOk := c.GetQuery("login")
+
+	updateFlag(analytics, analyticsOk, "STORE_ANALYTICS")
+	updateFlag(faves, favesOk, "CALL_FAVES")
+	updateFlag(login, loginOk, "CALL_LOGIN")
+
+	c.HTML(http.StatusOK, "index.tmpl.html", gin.H{
+		"analytics_status": os.Getenv("STORE_ANALYTICS"),
+		"faves_status":     os.Getenv("CALL_FAVES"),
+		"login_status":     os.Getenv("CALL_LOGIN"),
+	})
+}
+
 func search(c *gin.Context) {
 	start := time.Now()
 	// get search keywords
@@ -297,6 +324,7 @@ func main() {
 	router.GET("/getMovieById", getMovieByID)
 	router.GET("/search", search)
 	router.GET("/getMoviesByIds", getMoviesByIDs)
+	router.GET("/config", config)
 
 	router.Run(":" + port)
 }
