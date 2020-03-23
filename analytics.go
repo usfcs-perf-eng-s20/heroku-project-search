@@ -40,6 +40,7 @@ func getEvent(path string, timeMillis int64, response string, success bool, time
 }
 
 func postEvent(e *analyticsEvent) {
+	storeAnalytics = os.Getenv("STORE_ANALYTICS") == "true"
 	if !storeAnalytics {
 		return
 	}
