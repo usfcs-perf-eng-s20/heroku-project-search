@@ -43,16 +43,16 @@ func updateFlag(value string, statusOk bool, varName string) {
 
 func config(c *gin.Context) {
 	analytics, analyticsOk := c.GetQuery("analytics")
-	faves, favesOk := c.GetQuery("faves")
+	faves, favesOk := c.GetQuery("favs")
 	login, loginOk := c.GetQuery("login")
 
 	updateFlag(analytics, analyticsOk, "STORE_ANALYTICS")
-	updateFlag(faves, favesOk, "CALL_FAVES")
+	updateFlag(faves, favesOk, "CALL_FAVS")
 	updateFlag(login, loginOk, "CALL_LOGIN")
 
 	c.HTML(http.StatusOK, "config.tmpl.html", gin.H{
 		"analytics_status": os.Getenv("STORE_ANALYTICS"),
-		"faves_status":     os.Getenv("CALL_FAVES"),
+		"faves_status":     os.Getenv("CALL_FAVS"),
 		"login_status":     os.Getenv("CALL_LOGIN"),
 	})
 }
