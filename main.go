@@ -107,8 +107,8 @@ func search(c *gin.Context) {
 
 	for rows.Next() {
 		var dvd Detail
-		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
-			&dvd.Genre, &dvd.Upc, &dvd.ID)
+		queryErr := rows.Scan(&dvd.ID, &dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
+			&dvd.Genre, &dvd.Upc)
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, gin.H{
@@ -207,8 +207,8 @@ func getMoviesByIDs(c *gin.Context) {
 
 	for rows.Next() {
 		var dvd Detail
-		queryErr := rows.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
-			&dvd.Genre, &dvd.Upc, &dvd.ID)
+		queryErr := rows.Scan(&dvd.ID, &dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
+			&dvd.Genre, &dvd.Upc)
 		switch queryErr {
 		case sql.ErrNoRows:
 			c.JSON(200, gin.H{
@@ -276,8 +276,8 @@ func getMovieByID(c *gin.Context) {
 	var dvd Detail
 	row := db.QueryRow(sqlStatement, id)
 
-	queryErr := row.Scan(&dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
-		&dvd.Genre, &dvd.Upc, &dvd.ID)
+	queryErr := row.Scan(&dvd.ID, &dvd.Title, &dvd.Studio, &dvd.Price, &dvd.Rating, &dvd.Year,
+		&dvd.Genre, &dvd.Upc)
 
 	switch queryErr {
 	case sql.ErrNoRows:
