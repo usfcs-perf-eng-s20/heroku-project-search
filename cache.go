@@ -5,10 +5,12 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 )
 
 
 var cache = createCache()
+var mutex sync.RWMutex
 
 type cacheKey struct {
 	path string
