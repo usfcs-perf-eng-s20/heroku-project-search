@@ -63,7 +63,11 @@ func search(c *gin.Context) {
 	keyword := c.Query("keyword")
 	var event *analyticsEvent
 	queryKey := getCacheKey("/search", keyword)
+
+	mutex.RLock()
 	resp, hit := cache.Get(queryKey)
+	mutex.RUnlock()
+
 	if hit {
 		c.JSON(200, gin.H{
 			"success": "true",
@@ -138,7 +142,10 @@ func search(c *gin.Context) {
 	})
 	event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+
+	mutex.Lock()
 	cache.Add(queryKey, dvds)
+	mutex.Unlock()
 }
 
 func getMoviesByIDs(c *gin.Context) {
@@ -146,7 +153,11 @@ func getMoviesByIDs(c *gin.Context) {
 	var event *analyticsEvent
 	ids := c.Query("ids")
 	queryKey := getCacheKey("/getMoviesByIDs", ids)
+
+	mutex.RLock()
 	resp, hit := cache.Get(queryKey)
+	mutex.RUnlock()
+
 	if hit {
 		c.JSON(200, gin.H{
 			"success": "true",
@@ -238,7 +249,10 @@ func getMoviesByIDs(c *gin.Context) {
 	})
 	event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+
+	mutex.Lock()
 	cache.Add(queryKey, dvds)
+	mutex.Unlock()
 }
 
 func getMovieByID(c *gin.Context) {
@@ -246,7 +260,11 @@ func getMovieByID(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
 	var event *analyticsEvent
 	queryKey := getCacheKey("/getMovieByID", strconv.Itoa(int(id)))
+
+	mutex.RLock()
 	resp, hit := cache.Get(queryKey)
+	mutex.RUnlock()
+
 	if hit {
 		c.JSON(200, gin.H{
 			"success": "true",
@@ -303,7 +321,10 @@ func getMovieByID(c *gin.Context) {
 	c.JSON(200, dvd)
 	event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
+
+	mutex.Lock()
 	cache.Add(queryKey, dvd)
+	mutex.Unlock()
 }
 
 func main() {
