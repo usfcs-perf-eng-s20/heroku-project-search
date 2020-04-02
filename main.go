@@ -98,7 +98,7 @@ func search(c *gin.Context) {
 	}
 	defer db.Close()
 
-	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE '%' || $1 || '%' LIMIT 50;`
+	sqlStatement := `SELECT * FROM dvds WHERE LOWER(title) LIKE $1 || '%' LIMIT 50;`
 	rows, err := db.Query(sqlStatement, strings.ToLower(keyword))
 
 	if err != nil {
