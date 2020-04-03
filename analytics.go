@@ -33,7 +33,7 @@ func getEvent(path string, timeMillis int64, response string, success bool, time
 		Response:  response,
 		Service:   "search",
 		Success:   success,
-		Timestamp: strconv.Itoa(int(timestamp.UTC().Unix())),
+		Timestamp: strconv.Itoa(int(timestamp.UTC().Unix())) + "000",
 		Username:  "",
 	}
 	return &e
