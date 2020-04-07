@@ -30,8 +30,8 @@ type idList struct {
 	IdList []int64 `json:"ids" binding:"required"`
 }
 
-var loaderIOPath = "loaderio-3de0f0982ae46c3487a25b4f0ad6b016.txt"
-var loaderIOUrlPath = "/loaderio-3de0f0982ae46c3487a25b4f0ad6b016.txt"
+var loaderIOPath = "loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
+var loaderIOUrlPath = "/loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
 
 func updateFlag(value string, statusOk bool, varName string) {
 	if statusOk {
