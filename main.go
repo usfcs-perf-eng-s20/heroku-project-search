@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	_ "github.com/heroku/x/hmetrics/onload"
 	_ "github.com/lib/pq"
 )
@@ -374,6 +375,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
+	router.Use(cors.Default())
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 
 	router.GET("/", func(c *gin.Context) {
