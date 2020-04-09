@@ -32,6 +32,8 @@ type idList struct {
 
 var loaderIOPath = "loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
 var loaderIOUrlPath = "/loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
+var hostName = "https://perfeng-search.herokuapp.com/"
+var serviceName = "search"
 
 func updateFlag(value string, statusOk bool, varName string) {
 	if statusOk {
@@ -45,6 +47,7 @@ func updateFlag(value string, statusOk bool, varName string) {
 }
 
 func config(c *gin.Context) {
+	start := time.Now()
 	analytics, analyticsOk := c.GetQuery("analytics")
 	faves, favesOk := c.GetQuery("favs")
 	login, loginOk := c.GetQuery("login")
@@ -52,6 +55,9 @@ func config(c *gin.Context) {
 	updateFlag(analytics, analyticsOk, "STORE_ANALYTICS")
 	updateFlag(faves, favesOk, "CALL_FAVS")
 	updateFlag(login, loginOk, "CALL_LOGIN")
+
+	logMessage := getConfigLogMessage(hostName, serviceName, "GET", "/config", analytics, faves, login, 0, time.Since(start).Milliseconds(), "config flag updated")
+	log.Println(logMessage)
 
 	c.HTML(http.StatusOK, "config.tmpl.html", gin.H{
 		"analytics_status": os.Getenv("STORE_ANALYTICS"),
@@ -79,7 +85,8 @@ func search(c *gin.Context) {
 		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		log.Println("Fetching results from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0,  time.Since(start).Milliseconds(), 1, "fetch result from cache")
+		log.Println(logMessage)
 		return
 	}
 
@@ -87,6 +94,8 @@ func search(c *gin.Context) {
 
 	db, err := getDbConn()
 	if err != nil {
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Milliseconds(), 0, "db connection error")
+		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -102,6 +111,8 @@ func search(c *gin.Context) {
 	rows, err := db.Query(sqlStatement, strings.ToLower(keyword))
 
 	if err != nil {
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Milliseconds(), 0, "error querying db")
+		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -128,7 +139,9 @@ func search(c *gin.Context) {
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
-			log.Println(queryErr)
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Milliseconds(), 1, "error querying db")
+			log.Println(logMessage)
+			log.Println(err)
 			c.JSON(500, gin.H{
 				"success": "false",
 				"message": "internal server error",
@@ -139,6 +152,8 @@ func search(c *gin.Context) {
 		}
 	}
 
+	logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0,  time.Since(start).Milliseconds(), 0, "fetch result from db")
+	log.Println(logMessage)
 	c.JSON(200, gin.H{
 		"success": "true",
 		"results": dvds,
@@ -149,6 +164,7 @@ func search(c *gin.Context) {
 	mutex.Lock()
 	cache.Add(queryKey, dvds)
 	mutex.Unlock()
+
 }
 
 func getMoviesByIDs(c *gin.Context) {
@@ -169,7 +185,8 @@ func getMoviesByIDs(c *gin.Context) {
 		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		log.Println("Fetching results from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIDs", ids, 0,  time.Since(start).Milliseconds(), 1, "fetch result from cache")
+		log.Println(logMessage)
 		return
 	}
 	var idList []int
@@ -180,6 +197,8 @@ func getMoviesByIDs(c *gin.Context) {
 	for i := 0; i < len(idsString); i++ {
 		id, err := strconv.Atoi(strings.TrimSpace(idsString[i]))
 		if err != nil {
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Milliseconds(), 0, "bad request")
+			log.Println(logMessage)
 			log.Println(err)
 			c.JSON(400, gin.H{
 				"success": "false",
@@ -194,6 +213,8 @@ func getMoviesByIDs(c *gin.Context) {
 
 	db, err := getDbConn()
 	if err != nil {
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Milliseconds(), 0, "db connection error")
+		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -209,6 +230,8 @@ func getMoviesByIDs(c *gin.Context) {
 	rows, err := db.Query(sqlStatement, pq.Array(idList))
 
 	if err != nil {
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Milliseconds(), 0, "error querying db")
+		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -235,6 +258,8 @@ func getMoviesByIDs(c *gin.Context) {
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Milliseconds(), 0, "error querying db")
+			log.Println(logMessage)
 			log.Println(queryErr)
 			c.JSON(500, gin.H{
 				"success": "false",
@@ -246,6 +271,8 @@ func getMoviesByIDs(c *gin.Context) {
 		}
 	}
 
+	logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 0,  time.Since(start).Milliseconds(), 0, "fetch result from db")
+	log.Println(logMessage)
 	c.JSON(200, gin.H{
 		"success": "true",
 		"results": dvds,
@@ -260,7 +287,8 @@ func getMoviesByIDs(c *gin.Context) {
 
 func getMovieByID(c *gin.Context) {
 	start := time.Now()
-	id, err := strconv.ParseInt(c.Query("id"), 10, 64)
+	idStr := c.Query("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	var event *analyticsEvent
 	queryKey := getCacheKey("/getMovieByID", strconv.Itoa(int(id)))
 
@@ -276,12 +304,15 @@ func getMovieByID(c *gin.Context) {
 		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		log.Println("Fetching results from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 0,  time.Since(start).Milliseconds(), 1, "fetch result from cache")
+		log.Println(logMessage)
 		return
 	}
 
 	db, err := getDbConn()
 	if err != nil {
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 1,  time.Since(start).Milliseconds(), 0, "db connection error")
+		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -311,6 +342,8 @@ func getMovieByID(c *gin.Context) {
 		return
 	case nil:
 	default:
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 1,  time.Since(start).Milliseconds(), 0, "error querying db")
+		log.Println(logMessage)
 		log.Println(queryErr)
 		c.JSON(500, gin.H{
 			"success": "false",
@@ -321,6 +354,8 @@ func getMovieByID(c *gin.Context) {
 		return
 	}
 
+	logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 0,  time.Since(start).Milliseconds(), 0, "fetch result from db")
+	log.Println(logMessage)
 	c.JSON(200, dvd)
 	event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 	go postEvent(event)
