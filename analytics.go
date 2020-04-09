@@ -52,7 +52,7 @@ func postEvent(e *analyticsEvent) {
 
 	req, err := http.NewRequest("POST", analyticsHost, bytes.NewBuffer(jsonEvent))
 	if err != nil {
-		log.Println("internal error:", err)
+		log.Println("POST to /saveEdr: internal error:", err)
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
@@ -65,5 +65,5 @@ func postEvent(e *analyticsEvent) {
 	}
 	defer resp.Body.Close()
 
-	log.Println("updated analytics with status:", resp.Status)
+	log.Println("POST to /saveEdr: updated analytics with status:", resp.Status)
 }
