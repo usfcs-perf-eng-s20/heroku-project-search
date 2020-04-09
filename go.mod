@@ -1,8 +1,9 @@
 module git.heroku.com/project-go-search
 
-go 1.12
+go 1.13
 
 require (
+	github.com/gin-contrib/cors v1.3.1 // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e
