@@ -214,7 +214,7 @@ func getMoviesByIDs(c *gin.Context) {
 
 	db, err := getDbConn()
 	if err != nil {
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Milliseconds(), 0, "db connection error")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1, time.Since(start).Nanoseconds()/1000000, 0, "db connection error")
 		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
