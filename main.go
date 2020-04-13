@@ -3,15 +3,17 @@ package main
 import (
 	"database/sql"
 	"github.com/lib/pq"
+	newrelic "github.com/newrelic/go-agent"
 	"log"
+
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
 	_ "github.com/lib/pq"
 )
@@ -35,6 +37,8 @@ var loaderIOPath = "loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
 var loaderIOUrlPath = "/loaderio-b5db249a1a78a9873b364017c18a4edb.txt"
 var hostName = "https://perfeng-search.herokuapp.com/"
 var serviceName = "search"
+var APP_NAME = "perfeng_search"
+var NEWRELIC_KEY = "310ab9b1832faccbf5d072e2a828f4535fedNRAL"
 
 func updateFlag(value string, statusOk bool, varName string) {
 	if statusOk {
@@ -86,7 +90,7 @@ func search(c *gin.Context) {
 		event = getEvent("/search", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0,  time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0, time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
 		log.Println(logMessage)
 		return
 	}
@@ -95,7 +99,7 @@ func search(c *gin.Context) {
 
 	db, err := getDbConn()
 	if err != nil {
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Nanoseconds()/1000000, 0, "db connection error")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1, time.Since(start).Nanoseconds()/1000000, 0, "db connection error")
 		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
@@ -112,7 +116,7 @@ func search(c *gin.Context) {
 	rows, err := db.Query(sqlStatement, strings.ToLower(keyword))
 
 	if err != nil {
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1, time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
 		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
@@ -140,7 +144,7 @@ func search(c *gin.Context) {
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
-			logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1,  time.Since(start).Nanoseconds()/1000000, 1, "error querying db")
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 1, time.Since(start).Nanoseconds()/1000000, 1, "error querying db")
 			log.Println(logMessage)
 			log.Println(err)
 			c.JSON(500, gin.H{
@@ -153,7 +157,7 @@ func search(c *gin.Context) {
 		}
 	}
 
-	logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0,  time.Since(start).Nanoseconds()/1000000, 0, "fetch result from db")
+	logMessage := getLogMessage(hostName, serviceName, "GET", "/search", keyword, 0, time.Since(start).Nanoseconds()/1000000, 0, "fetch result from db")
 	log.Println(logMessage)
 	c.JSON(200, gin.H{
 		"success": "true",
@@ -186,7 +190,7 @@ func getMoviesByIDs(c *gin.Context) {
 		event = getEvent("/getMoviesByIds", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIDs", ids, 0,  time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIDs", ids, 0, time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
 		log.Println(logMessage)
 		return
 	}
@@ -198,7 +202,7 @@ func getMoviesByIDs(c *gin.Context) {
 	for i := 0; i < len(idsString); i++ {
 		id, err := strconv.Atoi(strings.TrimSpace(idsString[i]))
 		if err != nil {
-			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Nanoseconds()/1000000, 0, "bad request")
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1, time.Since(start).Nanoseconds()/1000000, 0, "bad request")
 			log.Println(logMessage)
 			log.Println(err)
 			c.JSON(400, gin.H{
@@ -231,7 +235,7 @@ func getMoviesByIDs(c *gin.Context) {
 	rows, err := db.Query(sqlStatement, pq.Array(idList))
 
 	if err != nil {
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1, time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
 		log.Println(logMessage)
 		log.Println(err)
 		c.JSON(500, gin.H{
@@ -259,7 +263,7 @@ func getMoviesByIDs(c *gin.Context) {
 		case nil:
 			dvds = append(dvds, dvd)
 		default:
-			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1,  time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
+			logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 1, time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
 			log.Println(logMessage)
 			log.Println(queryErr)
 			c.JSON(500, gin.H{
@@ -272,7 +276,7 @@ func getMoviesByIDs(c *gin.Context) {
 		}
 	}
 
-	logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 0,  time.Since(start).Nanoseconds()/1000000, 0, "fetch result from db")
+	logMessage := getLogMessage(hostName, serviceName, "GET", "/getMoviesByIds", ids, 0, time.Since(start).Nanoseconds()/1000000, 0, "fetch result from db")
 	log.Println(logMessage)
 	c.JSON(200, gin.H{
 		"success": "true",
@@ -305,7 +309,7 @@ func getMovieByID(c *gin.Context) {
 		event = getEvent("/getMovieById", time.Since(start).Nanoseconds()/1000, "200", true, start)
 		go postEvent(event)
 
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 0,  time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 0, time.Since(start).Nanoseconds()/1000000, 1, "fetch result from cache")
 		log.Println(logMessage)
 		return
 	}
@@ -343,7 +347,7 @@ func getMovieByID(c *gin.Context) {
 		return
 	case nil:
 	default:
-		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 1,  time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
+		logMessage := getLogMessage(hostName, serviceName, "GET", "/getMovieById", idStr, 1, time.Since(start).Nanoseconds()/1000000, 0, "error querying db")
 		log.Println(logMessage)
 		log.Println(queryErr)
 		c.JSON(500, gin.H{
@@ -366,6 +370,26 @@ func getMovieByID(c *gin.Context) {
 	mutex.Unlock()
 }
 
+func newRelicMiddleware(appName string, license string) gin.HandlerFunc {
+
+	if appName == "" || license == "" {
+		return func(c *gin.Context) {}
+	}
+
+	config := newrelic.NewConfig(appName, license)
+	app, err := newrelic.NewApplication(config)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return func(c *gin.Context) {
+		txn := app.StartTransaction(c.Request.URL.Path, c.Writer, c.Request)
+		defer txn.End()
+		c.Next()
+	}
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -376,6 +400,7 @@ func main() {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
+	router.Use(newRelicMiddleware(APP_NAME, NEWRELIC_KEY))
 	router.LoadHTMLGlob("templates/*.tmpl.html")
 
 	router.GET("/", func(c *gin.Context) {

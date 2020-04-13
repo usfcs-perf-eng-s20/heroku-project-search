@@ -18,6 +18,7 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/newrelic/go-agent v3.4.0+incompatible // indirect
 	golang.org/x/net v0.0.0-20150629084131-d9558e5c97f8 // indirect
 	golang.org/x/sys v0.0.0-20200217220822-9197077df867 // indirect
 	gopkg.in/bluesuncorp/validator.v5 v5.9.1 // indirect
