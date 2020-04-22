@@ -19,6 +19,7 @@ import (
 
 )
 
+
 type Detail struct {
 	Title  string
 	Studio string
